@@ -63,7 +63,9 @@ python3 train.py -c config/PreTraining.config -g 0
 
 ### Fine-tune
 ```
-python3 train.py -c config/FineTuning.config -g 0 --pretrained_bert_path checkpoint/PreTrain/epoch_1/
+# Choose an appropriate model to fine-tune
+python3 train.py -c config/FineTuning.config -g 0 \
+    --pretrained_bert_path checkpoint/PreTrain/epoch_15/
 ```
 
 ### Cite
