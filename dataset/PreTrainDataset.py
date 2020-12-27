@@ -59,7 +59,7 @@ class PreTrainDataset(Dataset):
                 else:
                     self.doc_data[docid]['labels'][laid]['good'] = False
 
-        pair2doc = json.load(open('/data/disk2/private/xcj/DocRed/data/pair2distantdoc.json', 'r'))
+        pair2doc = json.load(open('data/pair2distantdoc.json', 'r'))
         
         try:
             ratio = config.getfloat('train', 'data_ratio')
