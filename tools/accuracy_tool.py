@@ -3,6 +3,64 @@ import torch
 
 logger = logging.Logger(__name__)
 
+def get_prf(res):
+    # According to https://github.com/dice-group/gerbil/wiki/Precision,-Recall-and-F1-measure
+    if res["TP"] == 0:
+        if res["FP"] == 0 and res["FN"] == 0:
+            precision = 1.0
+            recall = 1.0
+            f1 = 1.0
+        else:
+            precision = 0.0
+            recall = 0.0
+            f1 = 0.0
+    else:
+        precision = 1.0 * res["TP"] / (res["TP"] + res["FP"])
+        recall = 1.0 * res["TP"] / (res["TP"] + res["FN"])
+        f1 = 2 * precision * recall / (precision + recall)
+
+    return precision, recall, f1
+
+
+def gen_micro_macro_result(res):
+    precision = []
+    recall = []
+    f1 = []
+    total = {"TP": 0, "FP": 0, "FN": 0, "TN": 0}
+    for a in range(0, len(res)):
+        total["TP"] += res[a]["TP"]
+        total["FP"] += res[a]["FP"]
+        total["FN"] += res[a]["FN"]
+        total["TN"] += res[a]["TN"]
+
+        p, r, f = get_prf(res[a])
+        precision.append(p)
+        recall.append(r)
+        f1.append(f)
+
+    micro_precision, micro_recall, micro_f1 = get_prf(total)
+
+    macro_precision = 0
+    macro_recall = 0
+    macro_f1 = 0
+    for a in range(0, len(f1)):
+        macro_precision += precision[a]
+        macro_recall += recall[a]
+        macro_f1 += f1[a]
+
+    macro_precision /= len(f1)
+    macro_recall /= len(f1)
+    macro_f1 /= len(f1)
+
+    return {
+        "micro_precision": round(micro_precision, 3),
+        "micro_recall": round(micro_recall, 3),
+        "micro_f1": round(micro_f1, 3),
+        "macro_precision": round(macro_precision, 3),
+        "macro_recall": round(macro_recall, 3),
+        "macro_f1": round(macro_f1, 3)
+    }
+
 
 
 def Multi_Label_DocRED(outputs, label, label_mask, result = None):
